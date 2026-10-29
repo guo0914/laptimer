@@ -5,8 +5,8 @@
 .DESCRIPTION
   用 Windows 版 Swift 编译器 + 最小平台桩，完成三件事：
     1. 引擎层类型检查（真实编译，捕获类型与成员错误）
-    2. 格式化逻辑断言（21 项）
-    3. 引擎行为断言（55 项，含限时到点、暂停不累计、重启恢复）
+    2. 格式化与解析断言
+    3. 引擎行为断言（含限时到点、暂停不累计、重启恢复）
 
   再加上三个 Python 静态检查，覆盖了除 SwiftUI 视图之外的所有层面。
   视图层仍需在 Mac 的 Xcode 里编译验证。
@@ -206,7 +206,8 @@ if (-not $swiftBin) {
             $out = & ".\$logicExe" 2>&1
             $code = $LASTEXITCODE
             $out | Where-Object { $_ -match 'FAIL|项失败|全部通过' } | ForEach-Object { Write-Host "  $_" }
-            if ($code -eq 0) { Add-Pass "格式化逻辑断言（21 项）" } else { Add-Fail "格式化逻辑断言" "退出码 $code" }
+            $count = ($out | Where-Object { $_ -match '  ok   |  FAIL ' }).Count
+            if ($code -eq 0) { Add-Pass "格式化与解析断言（$count 项）" } else { Add-Fail "格式化与解析断言" "退出码 $code" }
         }
 
         $engineExe = 'build\engine-check.exe'
@@ -217,7 +218,8 @@ if (-not $swiftBin) {
             $out2 = & ".\$engineExe" 2>&1
             $code2 = $LASTEXITCODE
             $out2 | Where-Object { $_ -match 'FAIL|项失败|全部通过' } | ForEach-Object { Write-Host "  $_" }
-            if ($code2 -eq 0) { Add-Pass "引擎行为断言（55 项）" } else { Add-Fail "引擎行为断言" "退出码 $code2" }
+            $count2 = ($out2 | Where-Object { $_ -match '  ok   |  FAIL ' }).Count
+            if ($code2 -eq 0) { Add-Pass "引擎行为断言（$count2 项）" } else { Add-Fail "引擎行为断言" "退出码 $code2" }
         }
 
         Remove-Item '.enginecheck-store' -Recurse -Force -ErrorAction SilentlyContinue

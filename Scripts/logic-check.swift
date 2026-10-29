@@ -58,6 +58,52 @@ struct LogicCheck {
         expectEqual(TimeText.delta(-12.2), "−12\"", "偏快差值（负号是 U+2212）")
         expectEqual(TimeText.delta(0.4), "持平", "无差值")
 
+        // 键盘输入的时长解析
+        func expectDuration(_ text: String, _ expected: Double?, _ label: String) {
+            let actual = TimeText.parseDuration(text)
+            if let expected {
+                if let actual {
+                    expect(abs(actual - expected) < 0.001,
+                           "\(label)：\(text) → \(Int(actual))s（期望 \(Int(expected))s）")
+                } else {
+                    expect(false, "\(label)：\(text) 解析为 nil（期望 \(Int(expected))s）")
+                }
+            } else {
+                expect(actual == nil, "\(label)：\(text) 应解析失败")
+            }
+        }
+
+        expectDuration("30", 1800, "纯数字按分钟")
+        expectDuration("30:00", 1800, "分钟:秒")
+        expectDuration("1:30", 90, "1 分 30 秒")
+        expectDuration("1:30:00", 5400, "时:分:秒")
+        expectDuration("2:05:30", 7530, "带小时的完整写法")
+        expectDuration("90s", 90, "秒单位")
+        expectDuration("90秒", 90, "中文秒单位")
+        expectDuration("2h", 7200, "小时单位")
+        expectDuration("2小时", 7200, "中文小时单位")
+        expectDuration("15m", 900, "分钟单位")
+        expectDuration("15分", 900, "中文分钟单位")
+        expectDuration(" 30 ", 1800, "首尾空格")
+        expectDuration("1：30", 90, "全角冒号")
+        expectDuration("0.5", 30, "小数分钟")
+        expectDuration("", nil, "空字符串")
+        expectDuration("abc", nil, "非数字")
+        expectDuration("0", nil, "零应视为无效")
+        expectDuration("-5", nil, "负数应视为无效")
+        expectDuration("1:2:3:4", nil, "超过三段应无效")
+
+        // 回读：秒数 → 输入框文本 → 解析回原值
+        expectEqual(TimeText.durationInputText(1800), "30", "30 分钟回读")
+        expectEqual(TimeText.durationInputText(90), "1:30", "90 秒回读")
+        expectEqual(TimeText.durationInputText(5400), "1:30:00", "90 分钟回读")
+        expectEqual(TimeText.durationInputText(0), "", "零值回读为空")
+        for value in [60.0, 90.0, 600.0, 1800.0, 5400.0, 7200.0] {
+            let text = TimeText.durationInputText(value)
+            let back = TimeText.parseDuration(text)
+            expect(back == value, "回读往返一致：\(Int(value))s → \"\(text)\" → \(back.map { Int($0) } ?? -1)s")
+        }
+
         // 引擎的时间推算：累计 + 运行中增量
         struct Snap {
             var accumulated: Double
