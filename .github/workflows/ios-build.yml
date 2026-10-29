@@ -15,11 +15,11 @@ name: iOS Build
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "LapTimer/**"
-      - "Scripts/**"
+
+# 说明：这个工作流需要签名凭据（Secrets）。
+# 没配 Secrets 时它会立刻失败，所以只在手动触发时运行，
+# 避免每次 push 都产生一条失败记录。
+# 想要「push 自动构建未签名 ipa」用 ios-unsigned-ipa.yml。
 
 jobs:
   build:
