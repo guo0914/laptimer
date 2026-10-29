@@ -39,11 +39,35 @@ LapTimer/
    └─ make-icon.py              # 重新生成 AppIcon
 ```
 
+## 自检（不需要 Mac）
+
+工程自带一条命令，尽量在 Windows 上把逻辑层验证到位：
+
+```powershell
+cd ios/LapTimer
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Scripts\verify.ps1
+```
+
+它会做四件事：
+
+1. 静态检查源码括号 / UTF-8、视图引用的引擎成员是否存在、pbxproj 与资源是否完整
+2. 用 Windows 版 Swift 编译器 + 最小平台桩，对引擎层 9 个源文件做真实类型检查
+3. 跑 21 项格式化断言（进位、超一小时、向上取整、偏差符号等）
+4. 跑 55 项引擎行为断言（分段切分、暂停不累计、限时到点后继续计时、重启恢复）
+
+需要一次性装两样东西（约 5 GB）：
+
+```powershell
+winget install --id Swift.Toolchain --exact
+winget install --id Microsoft.VisualStudio.2022.BuildTools --exact --override "--quiet --wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+
+> SwiftUI 视图层无法在 Windows 上编译，仍需在 Mac 的 Xcode 里验证。
 ## 在 Mac 上跑起来
 
 1. 把整个 `LapTimer` 目录拷到 Mac（或 `git clone`）。
 2. `open LapTimer/LapTimer.xcodeproj`。
-3. Xcode → Signing & Capabilities → Team 选你自己的账号（`PRODUCT_BUNDLE_IDENTIFIER` 默认 `com.example.LapTimer`，建议改成 `com.你的域名.LapTimer`）。
+3. Xcode → Signing & Capabilities → Team 选你自己的账号（`PRODUCT_BUNDLE_IDENTIFIER` 已设为 `com.yanruilin.laptimer`，如与他人冲突可自行改）。
 4. 选 iPhone 模拟器或真机 → Run。部署目标 iOS 17.0，无第三方依赖，不需要 `pod install`。
 
 > 我这边是 Windows，无法编译 / 跑模拟器。已用三个静态检查脚本确认：括号与 UTF-8 完整、视图里引用的引擎成员全部存在、pbxproj 里 15 个源文件都在 Sources 阶段且资源 / Info.plist 合法。逻辑层另有 `logic-check.swift`，你在 Mac 上编译即可跑断言。

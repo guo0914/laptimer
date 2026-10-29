@@ -9,6 +9,8 @@ Checks performed:
 - asset catalog Contents.json files are valid JSON and referenced files exist
 """
 
+from __future__ import annotations
+from typing import List, Set, Dict, Tuple
 import json
 import pathlib
 import plistlib
@@ -30,7 +32,7 @@ RE_FILE_REF = re.compile(
 )
 
 
-def check_balance(text: str) -> list[str]:
+def check_balance(text: str) -> List[str]:
     problems = []
     pairs = {"{": "}", "(": ")"}
     stack = []

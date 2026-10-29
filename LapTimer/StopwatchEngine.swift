@@ -1,6 +1,8 @@
 import Foundation
-import SwiftUI
+
+#if canImport(Combine)
 import Combine
+#endif
 
 /// 正计时引擎：分段、限时、暂停/继续、进程重启后恢复。
 /// 时间一律用「累计时长 + 起跳时刻」推算，不做逐秒累加，

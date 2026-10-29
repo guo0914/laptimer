@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(UserNotifications)
 import UserNotifications
+#endif
 
 /// 后台提醒：App 被切到后台或锁屏时，靠本地通知把「到点」补上。
 /// 通知权限没给也不影响前台使用。

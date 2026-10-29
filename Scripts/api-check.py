@@ -3,6 +3,8 @@ exists on the corresponding Swift type. Rough regex-based, but catches typos
 and stale names without a Swift compiler.
 """
 
+from __future__ import annotations
+from typing import List, Set, Dict, Tuple
 import pathlib
 import re
 import sys
@@ -10,7 +12,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent / "LapTimer"
 
 
-def members(path: pathlib.Path) -> set[str]:
+def members(path: pathlib.Path) -> Set[str]:
     text = path.read_text(encoding="utf-8")
     names = set()
     names |= set(re.findall(r"(?:var|let)\s+([A-Za-z_][A-Za-z0-9_]*)\s*:", text))

@@ -1,6 +1,9 @@
-import SwiftUI
+import Foundation
+
+#if canImport(UIKit)
 import UIKit
 import AudioToolbox
+#endif
 
 /// 触觉与声音反馈。集中在这里，方便以后在设置里统一开关。
 enum Feedback {

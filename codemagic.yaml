@@ -16,7 +16,7 @@ workflows:
       xcode: latest
       vars:
         # 改成你自己的唯一 Bundle ID
-        BUNDLE_ID: com.example.LapTimer
+        BUNDLE_ID: com.yanruilin.laptimer
         # Xcode 工程里用的 scheme 名（与 target 同名）
         XCODE_SCHEME: LapTimer
         XCODE_PROJECT: LapTimer.xcodeproj
@@ -42,7 +42,7 @@ workflows:
         script: |
           cd "$CM_BUILD_DIR"
           /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" LapTimer/Info.plist 2>/dev/null || true
-          sed -i '' "s/com.example.LapTimer/$BUNDLE_ID/g" LapTimer.xcodeproj/project.pbxproj
+          sed -i '' "s/com.yanruilin.laptimer/$BUNDLE_ID/g" LapTimer.xcodeproj/project.pbxproj
       - name: 归档（Release，设备安装包）
         script: |
           xcodebuild archive \

@@ -1,6 +1,8 @@
 import Foundation
-import SwiftUI
+
+#if canImport(Combine)
 import Combine
+#endif
 
 /// 倒计时：常规功能，加「进程重启后继续」与后台到点通知。
 final class CountdownEngine: ObservableObject {
@@ -35,7 +37,13 @@ final class CountdownEngine: ObservableObject {
 
     var isRunning: Bool { snapshot.isRunning }
     var duration: TimeInterval { snapshot.duration }
-    var isFinished: Bool { snapshot.finished }
+
+    /// 到点判断不依赖 Timer 是否触发：只要「已开始 + 时间走完」就算结束。
+    /// 这样切后台、RunLoop 被占用、立即取用都能得到正确结果。
+    var isFinished: Bool {
+        if snapshot.finished { return true }
+        return !snapshot.isRunning && hasStarted && remaining() <= 0
+    }
 
     var progress: Double {
         guard snapshot.duration > 0 else { return 0 }

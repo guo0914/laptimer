@@ -4,6 +4,8 @@ Not a compiler — catches unbalanced braces/parens/brackets, stray
 non-UTF8 bytes, and unmatched string interpolation.
 """
 
+from __future__ import annotations
+from typing import List, Set, Dict, Tuple
 import pathlib
 import re
 import sys
@@ -86,7 +88,7 @@ def strip_strings_and_comments(text: str) -> str:
     return "".join(out)
 
 
-def check(name: str, text: str) -> list[str]:
+def check(name: str, text: str) -> List[str]:
     problems = []
     cleaned = strip_strings_and_comments(text)
     stack = []

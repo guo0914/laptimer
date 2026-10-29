@@ -1,5 +1,8 @@
 import Foundation
+
+#if canImport(Combine)
 import Combine
+#endif
 
 /// 历史记录存储。用「内存数组 + JSON 落盘」，最多保留 200 条。
 /// 只在主线程读写（由界面驱动）。
