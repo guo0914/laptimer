@@ -1,0 +1,326 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0000000000000000000031 /* LapTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000001 /* LapTimerApp.swift */; };
+		AA0000000000000000000032 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000002 /* Theme.swift */; };
+		AA0000000000000000000033 /* TimeFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000003 /* TimeFormatting.swift */; };
+		AA0000000000000000000034 /* TimerModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000004 /* TimerModels.swift */; };
+		AA0000000000000000000035 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000005 /* SessionStore.swift */; };
+		AA0000000000000000000036 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000006 /* Feedback.swift */; };
+		AA0000000000000000000037 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000007 /* Notifier.swift */; };
+		AA0000000000000000000038 /* StopwatchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000008 /* StopwatchEngine.swift */; };
+		AA0000000000000000000039 /* CountdownEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000009 /* CountdownEngine.swift */; };
+		AA000000000000000000003A /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000A /* HistoryStore.swift */; };
+		AA000000000000000000003B /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000B /* Components.swift */; };
+		AA000000000000000000003C /* StopwatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000C /* StopwatchView.swift */; };
+		AA000000000000000000003D /* CountdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000D /* CountdownView.swift */; };
+		AA000000000000000000003E /* LimitSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000E /* LimitSheet.swift */; };
+		AA000000000000000000003F /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000F /* HistoryView.swift */; };
+		AA0000000000000000000040 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000010 /* Assets.xcassets */; };
+		AA0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA0000000000000000000001 /* LapTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LapTimerApp.swift; sourceTree = "<group>"; };
+		AA0000000000000000000002 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		AA0000000000000000000003 /* TimeFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatting.swift; sourceTree = "<group>"; };
+		AA0000000000000000000004 /* TimerModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerModels.swift; sourceTree = "<group>"; };
+		AA0000000000000000000005 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000006 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		AA0000000000000000000007 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
+		AA0000000000000000000008 /* StopwatchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchEngine.swift; sourceTree = "<group>"; };
+		AA0000000000000000000009 /* CountdownEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownEngine.swift; sourceTree = "<group>"; };
+		AA000000000000000000000A /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
+		AA000000000000000000000B /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		AA000000000000000000000C /* StopwatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchView.swift; sourceTree = "<group>"; };
+		AA000000000000000000000D /* CountdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownView.swift; sourceTree = "<group>"; };
+		AA000000000000000000000E /* LimitSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitSheet.swift; sourceTree = "<group>"; };
+		AA000000000000000000000F /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA0000000000000000000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000012 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AA0000000000000000000013 /* LapTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LapTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA0000000000000000000062 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA0000000000000000000051 = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000052 /* LapTimer */,
+				AA0000000000000000000053 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000052 /* LapTimer */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000001 /* LapTimerApp.swift */,
+				AA0000000000000000000002 /* Theme.swift */,
+				AA0000000000000000000003 /* TimeFormatting.swift */,
+				AA0000000000000000000004 /* TimerModels.swift */,
+				AA0000000000000000000005 /* SessionStore.swift */,
+				AA0000000000000000000006 /* Feedback.swift */,
+				AA0000000000000000000007 /* Notifier.swift */,
+				AA0000000000000000000008 /* StopwatchEngine.swift */,
+				AA0000000000000000000009 /* CountdownEngine.swift */,
+				AA000000000000000000000A /* HistoryStore.swift */,
+				AA000000000000000000000B /* Components.swift */,
+				AA000000000000000000000C /* StopwatchView.swift */,
+				AA000000000000000000000D /* CountdownView.swift */,
+				AA000000000000000000000E /* LimitSheet.swift */,
+				AA000000000000000000000F /* HistoryView.swift */,
+				AA0000000000000000000010 /* Assets.xcassets */,
+				AA0000000000000000000012 /* PrivacyInfo.xcprivacy */,
+				AA0000000000000000000011 /* Info.plist */,
+			);
+			path = LapTimer;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000053 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000013 /* LapTimer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA0000000000000000000071 /* LapTimer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000000000000000000082 /* Build configuration list for PBXNativeTarget "LapTimer" */;
+			buildPhases = (
+				AA0000000000000000000061 /* Sources */,
+				AA0000000000000000000062 /* Frameworks */,
+				AA0000000000000000000063 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LapTimer;
+			productName = LapTimer;
+			productReference = AA0000000000000000000013 /* LapTimer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000000000000000000072 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AA0000000000000000000071 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = AA0000000000000000000081 /* Build configuration list for PBXProject "LapTimer" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				zh_CN,
+				en,
+				Base,
+			);
+			mainGroup = AA0000000000000000000051;
+			productRefGroup = AA0000000000000000000053 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA0000000000000000000071 /* LapTimer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA0000000000000000000063 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000040 /* Assets.xcassets in Resources */,
+				AA0000000000000000000041 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA0000000000000000000061 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000031 /* LapTimerApp.swift in Sources */,
+				AA0000000000000000000032 /* Theme.swift in Sources */,
+				AA0000000000000000000033 /* TimeFormatting.swift in Sources */,
+				AA0000000000000000000034 /* TimerModels.swift in Sources */,
+				AA0000000000000000000035 /* SessionStore.swift in Sources */,
+				AA0000000000000000000036 /* Feedback.swift in Sources */,
+				AA0000000000000000000037 /* Notifier.swift in Sources */,
+				AA0000000000000000000038 /* StopwatchEngine.swift in Sources */,
+				AA0000000000000000000039 /* CountdownEngine.swift in Sources */,
+				AA000000000000000000003A /* HistoryStore.swift in Sources */,
+				AA000000000000000000003B /* Components.swift in Sources */,
+				AA000000000000000000003C /* StopwatchView.swift in Sources */,
+				AA000000000000000000003D /* CountdownView.swift in Sources */,
+				AA000000000000000000003E /* LimitSheet.swift in Sources */,
+				AA000000000000000000003F /* HistoryView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000000000000000000091 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000092 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA0000000000000000000093 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LapTimer/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yanruilin.laptimer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000094 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LapTimer/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yanruilin.laptimer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA0000000000000000000081 /* Build configuration list for PBXProject "LapTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000091 /* Debug */,
+				AA0000000000000000000092 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000000000000000000082 /* Build configuration list for PBXNativeTarget "LapTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000093 /* Debug */,
+				AA0000000000000000000094 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000000000000000000072 /* Project object */;
+}

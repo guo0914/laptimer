@@ -1,0 +1,75 @@
+# Codemagic 云构建配置：没有 Mac 也能出 .ipa
+#
+# 用法：
+#   1. 把 timer-app/ios/LapTimer 推到 GitHub / GitLab 仓库
+#   2. 在 codemagic.io 里添加这个仓库，Codemagic 会自动读这个文件
+#   3. 在 Codemagic 的 Environment 里配置签名（见下方 signing 注释）
+#
+# 免费额度：每月约 500 分钟 macOS 构建，个人够用。
+
+workflows:
+  ios-release:
+    name: LapTimer iOS
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: latest
+      vars:
+        # 改成你自己的唯一 Bundle ID
+        BUNDLE_ID: com.example.LapTimer
+        # Xcode 工程里用的 scheme 名（与 target 同名）
+        XCODE_SCHEME: LapTimer
+        XCODE_PROJECT: LapTimer.xcodeproj
+      groups:
+        # 在 Codemagic 界面里建一个名为 "ios_signing" 的变量组，
+        # 里面放 App Store Connect API Key（推荐）或证书 + 描述文件
+        - ios_signing
+    scripts:
+      - name: 安装依赖（本项目无第三方依赖，仅校验）
+        script: |
+          xcodebuild -version
+          xcodebuild -list -project "$XCODE_PROJECT"
+      - name: 自检：源码结构与工程完整性
+        script: |
+          python3 Scripts/structure-check.py
+          python3 Scripts/api-check.py
+          python3 Scripts/check-project.py
+      - name: 纯逻辑自检
+        script: |
+          swiftc LapTimer/TimeFormatting.swift Scripts/logic-check.swift -o /tmp/logiccheck
+          /tmp/logiccheck
+      - name: 设置 Bundle ID
+        script: |
+          cd "$CM_BUILD_DIR"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" LapTimer/Info.plist 2>/dev/null || true
+          sed -i '' "s/com.example.LapTimer/$BUNDLE_ID/g" LapTimer.xcodeproj/project.pbxproj
+      - name: 归档（Release，设备安装包）
+        script: |
+          xcodebuild archive \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/LapTimer.xcarchive \
+            -allowProvisioningUpdates \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
+      - name: 导出 ipa
+        script: |
+          # 需要一份 ExportOptions.plist，method 用 development / ad-hoc / app-store
+          xcodebuild -exportArchive \
+            -archivePath build/LapTimer.xcarchive \
+            -exportOptionsPlist ci/ExportOptions.plist \
+            -exportPath build/ipa \
+            -allowProvisioningUpdates
+    artifacts:
+      - build/ipa/*.ipa
+      - build/*.xcarchive
+      - /tmp/logiccheck
+    publishing:
+      email:
+        recipients:
+          - your@email.com
+        notify:
+          success: true
+          failure: true
