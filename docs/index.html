@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07090F">
+<title>分段计时 · 安装</title>
+<style>
+  :root {
+    --bg: #07090F;
+    --bg-top: #0B1219;
+    --text: #EEF2FA;
+    --text-2: #78859A;
+    --text-3: #646F84;
+    --accent: #5EEAD4;
+    --accent-2: #8FF6E6;
+    --warn: #F5C46B;
+    --surface: rgba(255,255,255,0.06);
+    --stroke: rgba(255,255,255,0.09);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(120% 60% at 50% -10%, rgba(94,234,212,0.16), transparent 60%),
+      linear-gradient(180deg, var(--bg-top), var(--bg) 45%);
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    padding: 32px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .wrap { width: 100%; max-width: 420px; }
+  .icon {
+    width: 96px; height: 96px; border-radius: 24px;
+    display: block; margin: 8px auto 18px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  h1 {
+    font-size: 26px; font-weight: 600; letter-spacing: 0.5px;
+    text-align: center; margin: 0 0 6px;
+  }
+  .sub {
+    text-align: center; color: var(--text-2); font-size: 13px;
+    margin: 0 0 26px; letter-spacing: 0.3px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--stroke);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+    backdrop-filter: blur(12px);
+  }
+  .btn {
+    display: block; width: 100%;
+    padding: 16px;
+    border: none; border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #04221D;
+    font-size: 17px; font-weight: 700; letter-spacing: 1px;
+    text-align: center; text-decoration: none;
+    box-shadow: 0 12px 28px rgba(94,234,212,0.28);
+    cursor: pointer;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn.disabled {
+    background: rgba(255,255,255,0.10);
+    color: var(--text-3);
+    box-shadow: none;
+    pointer-events: none;
+  }
+  .hint {
+    margin: 12px 2px 0; font-size: 12px; line-height: 1.65; color: var(--text-3);
+  }
+  .steps { counter-reset: s; margin: 0; padding: 0; list-style: none; }
+  .steps li {
+    position: relative; padding-left: 34px; margin-bottom: 14px;
+    font-size: 13.5px; line-height: 1.6; color: var(--text-2);
+  }
+  .steps li:last-child { margin-bottom: 0; }
+  .steps li::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; left: 0; top: 0;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(94,234,212,0.14);
+    border: 1px solid rgba(94,234,212,0.35);
+    color: var(--accent);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .steps b { color: var(--text); font-weight: 600; }
+  .title-sm {
+    font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase;
+    color: var(--text-3); margin: 0 0 12px;
+  }
+  .meta {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-3); padding-top: 12px;
+    border-top: 1px solid var(--stroke); margin-top: 12px;
+  }
+  .warn {
+    border-color: rgba(245,196,107,0.28);
+    background: rgba(245,196,107,0.08);
+  }
+  .warn .title-sm { color: var(--warn); }
+  .warn p { margin: 0; font-size: 12.5px; line-height: 1.65; color: #D9C9A6; }
+  .qr { display: block; width: 168px; height: 168px; margin: 4px auto 0; border-radius: 12px; background: #fff; padding: 8px; }
+  footer { margin-top: 26px; text-align: center; font-size: 11px; color: #3E4757; letter-spacing: 0.3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <img class="icon" src="icon-1024.png" alt="分段计时">
+  <h1>分段计时</h1>
+  <p class="sub">正计时分段 · 限时提醒 · 倒计时</p>
+
+  <div class="card">
+    <a id="installBtn" class="btn disabled" href="#">正在检查安装包…</a>
+    <p class="hint" id="hint">请用 iPhone 自带的 Safari 打开本页，其它浏览器不支持直接安装。</p>
+    <div class="meta">
+      <span>版本 1.0</span>
+      <span>iOS 17.0 及以上</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="title-sm">安装步骤</p>
+    <ol class="steps">
+      <li><b>用 Safari 打开本页</b>，点上面的「安装到 iPhone」，弹窗选「安装」。</li>
+      <li>回到桌面，等图标出现（图标可能是灰的，属正常）。</li>
+      <li>首次打开会提示「未受信任的开发者」。去 <b>设置 → 通用 → VPN 与设备管理</b>，点你的 Apple ID，选「信任」。</li>
+      <li>回桌面点开 App 即可使用。</li>
+    </ol>
+  </div>
+
+  <div class="card warn">
+    <p class="title-sm">签名有效期 7 天</p>
+    <p>免费 Apple ID 签名的 App 只能用 7 天，到期后图标打不开。到期时重新签名、再回到本页装一次即可，<b>计时记录不会丢</b>（存在 App 自己的沙盒里，覆盖安装会保留）。</p>
+  </div>
+
+  <div class="card">
+    <p class="title-sm">换台设备装</p>
+    <p class="hint" style="margin-top:0">把本页链接发到那台设备，用 Safari 打开即可。</p>
+    <img class="qr" src="qr.png" alt="安装页二维码">
+  </div>
+
+  <footer>LapTimer · 自制自用，未上架 App Store</footer>
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('installBtn');
+  var hint = document.getElementById('hint');
+  var manifest = 'https://guo0914.github.io/laptimer/manifest.plist';
+  var ipa = 'https://guo0914.github.io/laptimer/LapTimer-signed.ipa';
+
+  function ready() {
+    btn.className = 'btn';
+    btn.textContent = '安装到 iPhone';
+    btn.href = 'itms-services://?action=download-manifest&url=' + encodeURIComponent(manifest);
+  }
+  function missing() {
+    btn.className = 'btn disabled';
+    btn.textContent = '安装包未就绪';
+    hint.textContent = '签名后的安装包还没上传。请先在电脑上完成签名，再刷新本页。';
+  }
+
+  var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(navigator.userAgent);
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (!isIOS || !isSafari) {
+    btn.className = 'btn disabled';
+    btn.textContent = '请在 iPhone Safari 中打开';
+    hint.textContent = '微信、QQ、Chrome 等内置浏览器无法触发安装，请点右上角「…」选择「在 Safari 中打开」。';
+    return;
+  }
+
+  fetch(ipa, { method: 'HEAD', cache: 'no-store' })
+    .then(function (r) { r.ok ? ready() : missing(); })
+    .catch(missing);
+})();
+</script>
+</body>
+</html>
