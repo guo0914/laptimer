@@ -68,6 +68,14 @@
     cursor: pointer;
   }
   .btn:active { transform: scale(0.98); }
+  .btn.secondary {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text);
+    font-size: 15px; font-weight: 600;
+    box-shadow: none;
+  }
   .btn.disabled {
     background: rgba(255,255,255,0.10);
     color: var(--text-3);
@@ -111,6 +119,7 @@
   .warn p { margin: 0; font-size: 12.5px; line-height: 1.65; color: #D9C9A6; }
   .qr { display: block; width: 168px; height: 168px; margin: 4px auto 0; border-radius: 12px; background: #fff; padding: 8px; }
   footer { margin-top: 26px; text-align: center; font-size: 11px; color: #3E4757; letter-spacing: 0.3px; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -122,11 +131,13 @@
 
   <div class="card">
     <a id="installBtn" class="btn disabled" href="#">正在检查安装包…</a>
+    <a id="installBtn2" class="btn secondary disabled" href="#">备用通道（CDN）</a>
     <p class="hint" id="hint">请用 iPhone 自带的 Safari 打开本页，其它浏览器不支持直接安装。</p>
     <div class="meta">
-      <span>版本 1.0</span>
+      <span>版本 1.0 (1)</span>
       <span>iOS 17.0 及以上</span>
-    </div>  </div>
+    </div>
+  </div>
 
   <div class="card">
     <p class="title-sm">安装步骤</p>
@@ -138,6 +149,16 @@
     </ol>
   </div>
 
+  <div class="card">
+    <p class="title-sm">装不上？先做这一步</p>
+    <ol class="steps">
+      <li>把当前标签页<b>整个关掉</b>，重新用 Safari 打开本页（不要只点刷新）。</li>
+      <li>先点主按钮；若仍提示「无法安装」，<b>再点下面的「备用通道（CDN）」</b>——两条通道走的是不同的服务器和清单地址。</li>
+      <li>两条都不行的话，把手机<b>关掉 Wi-Fi 用蜂窝流量</b>再试一次。</li>
+    </ol>
+    <p class="hint">清单地址带时间戳，每次打开本页都是最新的，不会再读到旧缓存。</p>
+  </div>
+
   <div class="card warn">
     <p class="title-sm">本次签名到期：11 月 18 日凌晨</p>
     <p>免费 Apple ID 签名的 App 只能用 7 天，到期后图标打不开。到期时重新签名、再回到本页装一次即可，<b>计时记录不会丢</b>（存在 App 自己的沙盒里，覆盖安装会保留）。</p>
@@ -145,7 +166,7 @@
 
   <div class="card">
     <p class="title-sm">换台设备装</p>
-    <p class="hint" style="margin-top:0">把本页链接发到那台设备，用 Safari 打开即可。</p>
+    <p class="hint" style="margin-top:0">把本页链接发到那台设备，用 Safari 打开即可。注意：签名里只登记了这一台 iPhone 的 UDID，换设备需要重新签名。</p>
     <img class="qr" src="qr.png" alt="安装页二维码">
   </div>
 
@@ -155,31 +176,46 @@
 <script>
 (function () {
   var btn = document.getElementById('installBtn');
+  var btn2 = document.getElementById('installBtn2');
   var hint = document.getElementById('hint');
-  // 加时间戳防止 iPhone 复用旧的 manifest 缓存（GitHub Pages 是 max-age=600）
+
+  // 时间戳：GitHub Pages / jsDelivr 都会缓存清单，带上它保证每次拿到最新版本
   var stamp = String(Date.now());
-  var manifest = 'https://guo0914.github.io/laptimer/manifest.xml?v=' + stamp;
-  var ipa = 'https://guo0914.github.io/laptimer/LapTimer-signed.ipa';
+  var host = 'https://guo0914.github.io/laptimer/';
+  var cdn  = 'https://gcore.jsdelivr.net/gh/guo0914/laptimer@main/docs/';
+  var ipa  = host + 'LapTimer-signed.ipa';
+
+  var m1 = host + 'manifest.xml?v=' + stamp;
+  var m2 = cdn  + 'manifest-cdn.xml?v=' + stamp;
+
+  function itms(m) {
+    return 'itms-services://?action=download-manifest&url=' + encodeURIComponent(m);
+  }
+
+  var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(navigator.userAgent);
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (!isIOS || !isSafari) {
+    btn.className = 'btn disabled';
+    btn.textContent = '请在 iPhone Safari 中打开';
+    btn2.style.display = 'none';
+    hint.textContent = '微信、QQ、Chrome 等内置浏览器无法触发安装，请点右上角「…」选择「在 Safari 中打开」。';
+    return;
+  }
 
   function ready() {
     btn.className = 'btn';
     btn.textContent = '安装到 iPhone';
-    btn.href = 'itms-services://?action=download-manifest&url=' + encodeURIComponent(manifest);
+    btn.href = itms(m1);
+    btn2.className = 'btn secondary';
+    btn2.textContent = '备用通道（CDN）';
+    btn2.href = itms(m2);
   }
   function missing() {
     btn.className = 'btn disabled';
     btn.textContent = '安装包未就绪';
     hint.textContent = '签名后的安装包还没上传。请先在电脑上完成签名，再刷新本页。';
-  }
-
-  var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(navigator.userAgent);
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-  if (!isIOS || !isSafari) {
-    btn.className = 'btn disabled';
-    btn.textContent = '请在 iPhone Safari 中打开';
-    hint.textContent = '微信、QQ、Chrome 等内置浏览器无法触发安装，请点右上角「…」选择「在 Safari 中打开」。';
-    return;
   }
 
   fetch(ipa, { method: 'HEAD', cache: 'no-store' })
