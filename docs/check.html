@@ -132,7 +132,7 @@
 
   function checkManifest(key, url) {
     return fetch(url + '?z=' + Date.now(), { cache: 'no-store', mode: 'cors' })
-      .then(function (r) { return r.text().then(function (t) { return { status: r.status, type: r.headers.get('content-type') || '(无)', body: t }; }); })
+      .then(function (r) { return r.text().then(function (t) { return { ok: r.ok, status: r.status, type: r.headers.get('content-type') || '(无)', body: t }; }); })
       .then(function (res) {
         if (!res.ok && res.status !== 0) { mark(key, false, 'HTTP ' + res.status + ' · ' + res.type); return null; }
         var bid = (res.body.match(/<key>bundle-identifier<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
@@ -184,8 +184,8 @@
     checkManifest('mani2', CDN + 'manifest-cdn.xml')
   ]).then(function () {
     return Promise.all([
-      checkIpa('ipa', PAGES + 'LapTimer-signed.ipa'),
-      checkIpa('ipa2', CDN + 'LapTimer-signed.ipa'),
+      checkIpa('ipa', PAGES + 'LapTimer-install.ipa'),
+      checkIpa('ipa2', CDN + 'LapTimer-install.ipa'),
       checkApple('ppq', 'https://ppq.apple.com/', '开发者证书核验'),
       checkApple('ocsp', 'https://ocsp.apple.com/', '证书吊销查询')
     ]);
