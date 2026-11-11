@@ -156,7 +156,9 @@
 (function () {
   var btn = document.getElementById('installBtn');
   var hint = document.getElementById('hint');
-  var manifest = 'https://guo0914.github.io/laptimer/manifest.xml';
+  // 加时间戳防止 iPhone 复用旧的 manifest 缓存（GitHub Pages 是 max-age=600）
+  var stamp = String(Date.now());
+  var manifest = 'https://guo0914.github.io/laptimer/manifest.xml?v=' + stamp;
   var ipa = 'https://guo0914.github.io/laptimer/LapTimer-signed.ipa';
 
   function ready() {
