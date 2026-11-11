@@ -24,6 +24,13 @@
       <button class="seg is-on" data-mode="stopwatch" role="tab">正计时</button>
       <button class="seg" data-mode="countdown" role="tab">倒计时</button>
     </div>
+    <button class="icon-btn left" id="lockBtn" aria-label="锁屏显示" title="锁屏显示">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4.2" y="10.4" width="15.6" height="10" rx="2.6"></rect>
+        <path d="M8.2 10.4V7.6a3.8 3.8 0 0 1 7.6 0v2.8"></path>
+        <circle cx="12" cy="15.4" r="1.3"></circle>
+      </svg>
+    </button>
     <button class="icon-btn" id="historyBtn" aria-label="历史记录">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path>
@@ -152,6 +159,38 @@
   </div>
 </div>
 
+<div class="sheet" id="lockSheet" role="dialog" aria-modal="true" aria-label="锁屏显示">
+  <div class="sheet-head">
+    <button class="head-btn" id="lockCancel">关闭</button>
+    <span class="head-title">锁屏显示</span>
+    <span class="head-btn strong" id="lockSpacer" aria-hidden="true"></span>
+  </div>
+  <div class="sheet-body">
+    <div class="lock-preview" id="lockPreview">
+      <div class="lp-art" id="lpArt">12:34</div>
+      <div class="lp-text">
+        <div class="lp-title" id="lpTitle">分段计时</div>
+        <div class="lp-sub" id="lpSub">第 4 段 · 累计 12:34</div>
+      </div>
+      <div class="lp-bars"><span></span><span></span><span></span></div>
+    </div>
+
+    <p class="lock-lead">开启后，锁屏和「控制中心」会显示当前计时，锁屏状态下也会继续走秒、到点照样提醒。</p>
+
+    <button class="lock-toggle" id="lockToggle">
+      <span class="lt-label" id="lockToggleLabel">开启锁屏显示</span>
+      <span class="lt-switch" id="lockSwitch"><i></i></span>
+    </button>
+
+    <div class="note">
+      <p class="dim">原理：网页要占住 iOS 的锁屏媒体卡，就必须真的在播音频。所以开启时后台会循环播放一段听不见的静音（−90dB），代价是：</p>
+      <p class="dim">· 会顶掉正在放的音乐 / 播客，要先暂停它们</p>
+      <p class="dim">· 锁屏卡片显示「分段计时」，进度条只在设了限时或倒计时时才有</p>
+      <p class="dim">· 比较费电，长时间计完记得关掉</p>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="install-tip is-hidden" id="installTip">
@@ -161,6 +200,7 @@
 
 <script src="time.js"></script>
 <script src="core.js"></script>
+<script src="lockscreen.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

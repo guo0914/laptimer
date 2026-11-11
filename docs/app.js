@@ -179,7 +179,17 @@
     confirmDialog: $('confirmDialog'),
     toast: $('toast'),
     installTip: $('installTip'),
-    installTipClose: $('installTipClose')
+    installTipClose: $('installTipClose'),
+    lockBtn: $('lockBtn'),
+    lockSheet: $('lockSheet'),
+    lockToggle: $('lockToggle'),
+    lockSwitch: $('lockSwitch'),
+    lockToggleLabel: $('lockToggleLabel'),
+    lockCancel: $('lockCancel'),
+    lockPreview: $('lockPreview'),
+    lpArt: $('lpArt'),
+    lpTitle: $('lpTitle'),
+    lpSub: $('lpSub')
   };
 
   var mode = 'stopwatch';
@@ -574,6 +584,109 @@
     showSheet(el.durationSheet);
   }
 
+  /* ================= 锁屏显示（Media Session） ================= */
+
+  var LockScreen = window.LockScreen;
+  var LOCK_KEY = 'laptimer.lock';
+
+  function lockWanted() {
+    try { return localStorage.getItem(LOCK_KEY) === '1'; } catch (e) { return false; }
+  }
+
+  function setLockWanted(on) {
+    try { localStorage.setItem(LOCK_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+
+  /* 当前该往锁屏卡片上写什么 */
+  function lockInfo() {
+    if (mode === 'stopwatch') {
+      var elapsed = stopwatch.elapsed();
+      var n = sw.laps.length + (stopwatch.hasSession() ? 1 : 0);
+      var sub;
+      if (!stopwatch.hasSession()) sub = '未开始';
+      else if (sw.isRunning) sub = '第 ' + n + ' 段进行中 · 累计 ' + TimeText.lap(elapsed);
+      else sub = '已暂停 · 累计 ' + TimeText.lap(elapsed);
+      return {
+        title: TimeText.stopwatchParts(elapsed).main,
+        subtitle: sub,
+        elapsed: elapsed,
+        duration: sw.limit || 0,
+        paused: !sw.isRunning
+      };
+    }
+    var remaining = countdown.remaining();
+    return {
+      title: TimeText.countdown(remaining),
+      subtitle: countdown.isFinished() ? '已结束' : (cd.isRunning ? '倒计时中' : (countdown.hasStarted() ? '已暂停' : '准备就绪')),
+      elapsed: cd.duration - remaining,
+      duration: cd.duration,
+      paused: !cd.isRunning
+    };
+  }
+
+  function renderLockPreview() {
+    if (!el.lpArt) return;
+    var info = lockInfo();
+    el.lpArt.textContent = info.title;
+    el.lpSub.textContent = info.subtitle;
+    el.lpTitle.textContent = '分段计时';
+  }
+
+  function refreshLockUI() {
+    var on = !!(LockScreen && LockScreen.isOn());
+    if (el.lockBtn) el.lockBtn.classList.toggle('is-on', on);
+    if (el.lockToggle) el.lockToggle.classList.toggle('is-on', on);
+    if (el.lockToggleLabel) el.lockToggleLabel.textContent = on ? '锁屏显示已开启' : '开启锁屏显示';
+    renderLockPreview();
+  }
+
+  /* 真正开启：必须在用户点击的同步调用栈里，否则 iOS 不让播 */
+  function lockOn() {
+    if (!LockScreen || !LockScreen.supported()) {
+      toast('这个浏览器不支持锁屏显示');
+      return false;
+    }
+    var ok = LockScreen.enable();
+    if (!ok) { toast('开启失败，请再点一次'); return false; }
+    setLockWanted(true);
+    refreshLockUI();
+    /* play() 是异步的，被系统拒绝的话这里把开关状态纠正回来 */
+    setTimeout(refreshLockUI, 400);
+    return true;
+  }
+
+  function lockOff() {
+    if (LockScreen) LockScreen.disable();
+    setLockWanted(false);
+    refreshLockUI();
+  }
+
+  function pushLockInfo() {
+    if (!LockScreen || !LockScreen.isOn()) return;
+    LockScreen.update(lockInfo());
+  }
+
+  LockScreen && LockScreen.configure({
+    onResume: function () {
+      if (mode === 'stopwatch') { if (stopwatch.hasSession() && !sw.isRunning) stopwatch.togglePause(); }
+      else if (!cd.isRunning && countdown.hasStarted() && !countdown.isFinished()) countdown.resume();
+      renderAll();
+      pushLockInfo();
+    },
+    onPause: function () {
+      if (mode === 'stopwatch') { if (sw.isRunning) stopwatch.togglePause(); }
+      else if (cd.isRunning) countdown.pause();
+      renderAll();
+      pushLockInfo();
+    },
+    onNext: function () {
+      if (mode === 'stopwatch') { if (stopwatch.hasSession()) stopwatch.addLap(); }
+      else countdown.extend(60);
+      renderAll();
+      pushLockInfo();
+    }
+  });
+
   /* ================= 历史 ================= */
 
   function renderHistory() {
@@ -728,10 +841,13 @@
       if (sw.isRunning) stopwatch.checkLimit();
 
       var sec = Math.floor(stopwatch.elapsed(now));
-      if (sec !== lastSecond) { lastSecond = sec; }
+      if (sec !== lastSecond) { lastSecond = sec; pushLockInfo(); }
     } else {
       updateCountdownLive();
       if (cd.isRunning) countdown.checkFinished();
+
+      var csec = Math.ceil(countdown.remaining());
+      if (csec !== lastSecond) { lastSecond = csec; pushLockInfo(); }
     }
 
     requestAnimationFrame(frame);
@@ -755,6 +871,31 @@
 
   el.historyDone.addEventListener('click', closeSheet);
   el.backdrop.addEventListener('click', closeSheet);
+
+  if (el.lockBtn) el.lockBtn.addEventListener('click', function () {
+    /* 上次开过但被系统掐掉了（刷新/切后台），借这次点击补上 */
+    if (lockWanted() && LockScreen && LockScreen.supported() && !LockScreen.isOn()) {
+      LockScreen.enable();
+      pushLockInfo();
+    }
+    renderLockPreview();
+    refreshLockUI();
+    showSheet(el.lockSheet);
+    Feedback.tap();
+  });
+
+  if (el.lockCancel) el.lockCancel.addEventListener('click', closeSheet);
+
+  if (el.lockToggle) el.lockToggle.addEventListener('click', function () {
+    if (LockScreen && LockScreen.isOn()) {
+      lockOff();
+      toast('已关闭锁屏显示');
+    } else if (lockOn()) {
+      pushLockInfo();
+      toast('锁屏显示已开启');
+    }
+    Feedback.tap();
+  });
 
   el.limitCancel.addEventListener('click', closeSheet);
   el.limitDone.addEventListener('click', function () {
@@ -845,10 +986,15 @@
       /* 把运行态折叠成「累计 + 起跳时刻」，回来时按墙上时钟重算即可 */
       stopwatch.persistForBackground();
       countdown.persistForBackground();
+      pushLockInfo();
     } else {
       renderAll();
       if (sw.isRunning) keepAwake(true);
       if (cd.isRunning) keepAwake(true);
+      /* iOS 有时会掐掉后台音频，回前台补一次 */
+      if (lockWanted() && LockScreen && !LockScreen.isOn()) LockScreen.enable();
+      pushLockInfo();
+      refreshLockUI();
     }
   });
 
@@ -861,6 +1007,12 @@
   document.addEventListener('touchstart', function once() {
     ensureAudio();
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    /* 上次开过锁屏显示的话，借这次手势把静音音频续上 */
+    if (lockWanted() && LockScreen && LockScreen.supported() && !LockScreen.isOn()) {
+      LockScreen.enable();
+      refreshLockUI();
+      pushLockInfo();
+    }
     document.removeEventListener('touchstart', once);
   }, { passive: true });
 
