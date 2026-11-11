@@ -181,7 +181,7 @@
 
   Promise.all([
     checkManifest('mani', PAGES + 'manifest.xml'),
-    checkManifest('mani2', CDN + 'manifest-cdn.xml')
+    checkManifest('mani2', CDN + 'manifest-cdn2.xml')
   ]).then(function () {
     return Promise.all([
       checkIpa('ipa', PAGES + 'LapTimer-install.ipa'),
