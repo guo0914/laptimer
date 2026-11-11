@@ -2,227 +2,165 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="分段计时">
+<meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#07090F">
-<title>分段计时 · 安装</title>
-<style>
-  :root {
-    --bg: #07090F;
-    --bg-top: #0B1219;
-    --text: #EEF2FA;
-    --text-2: #78859A;
-    --text-3: #646F84;
-    --accent: #5EEAD4;
-    --accent-2: #8FF6E6;
-    --warn: #F5C46B;
-    --surface: rgba(255,255,255,0.06);
-    --stroke: rgba(255,255,255,0.09);
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background:
-      radial-gradient(120% 60% at 50% -10%, rgba(94,234,212,0.16), transparent 60%),
-      linear-gradient(180deg, var(--bg-top), var(--bg) 45%);
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-    padding: 32px 20px 48px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .wrap { width: 100%; max-width: 420px; }
-  .icon {
-    width: 96px; height: 96px; border-radius: 24px;
-    display: block; margin: 8px auto 18px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08);
-  }
-  h1 {
-    font-size: 26px; font-weight: 600; letter-spacing: 0.5px;
-    text-align: center; margin: 0 0 6px;
-  }
-  .sub {
-    text-align: center; color: var(--text-2); font-size: 13px;
-    margin: 0 0 26px; letter-spacing: 0.3px;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--stroke);
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 14px;
-    backdrop-filter: blur(12px);
-  }
-  .btn {
-    display: block; width: 100%;
-    padding: 16px;
-    border: none; border-radius: 16px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #04221D;
-    font-size: 17px; font-weight: 700; letter-spacing: 1px;
-    text-align: center; text-decoration: none;
-    box-shadow: 0 12px 28px rgba(94,234,212,0.28);
-    cursor: pointer;
-  }
-  .btn:active { transform: scale(0.98); }
-  .btn.secondary {
-    margin-top: 10px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: var(--text);
-    font-size: 15px; font-weight: 600;
-    box-shadow: none;
-  }
-  .btn.disabled {
-    background: rgba(255,255,255,0.10);
-    color: var(--text-3);
-    box-shadow: none;
-    pointer-events: none;
-  }
-  .hint {
-    margin: 12px 2px 0; font-size: 12px; line-height: 1.65; color: var(--text-3);
-  }
-  .steps { counter-reset: s; margin: 0; padding: 0; list-style: none; }
-  .steps li {
-    position: relative; padding-left: 34px; margin-bottom: 14px;
-    font-size: 13.5px; line-height: 1.6; color: var(--text-2);
-  }
-  .steps li:last-child { margin-bottom: 0; }
-  .steps li::before {
-    counter-increment: s; content: counter(s);
-    position: absolute; left: 0; top: 0;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(94,234,212,0.14);
-    border: 1px solid rgba(94,234,212,0.35);
-    color: var(--accent);
-    font-size: 11px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .steps b { color: var(--text); font-weight: 600; }
-  .title-sm {
-    font-size: 12px; letter-spacing: 1.6px; text-transform: uppercase;
-    color: var(--text-3); margin: 0 0 12px;
-  }
-  .meta {
-    display: flex; justify-content: space-between;
-    font-size: 12px; color: var(--text-3); padding-top: 12px;
-    border-top: 1px solid var(--stroke); margin-top: 12px;
-  }
-  .warn {
-    border-color: rgba(245,196,107,0.28);
-    background: rgba(245,196,107,0.08);
-  }
-  .warn .title-sm { color: var(--warn); }
-  .warn p { margin: 0; font-size: 12.5px; line-height: 1.65; color: #D9C9A6; }
-  .qr { display: block; width: 168px; height: 168px; margin: 4px auto 0; border-radius: 12px; background: #fff; padding: 8px; }
-  footer { margin-top: 26px; text-align: center; font-size: 11px; color: #3E4757; letter-spacing: 0.3px; }
-  code { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: var(--accent); }
-</style>
+<title>分段计时</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
-<div class="wrap">
+<div class="glow" id="glow"></div>
 
-  <img class="icon" src="icon-1024.png" alt="分段计时">
-  <h1>分段计时</h1>
-  <p class="sub">正计时分段 · 限时提醒 · 倒计时</p>
-
-  <div class="card">
-    <a id="installBtn" class="btn disabled" href="#">正在检查安装包…</a>
-    <a id="installBtn2" class="btn secondary disabled" href="#">备用通道（CDN）</a>
-    <p class="hint" id="hint">请用 iPhone 自带的 Safari 打开本页，其它浏览器不支持直接安装。</p>
-    <div class="meta">
-      <span>版本 1.0 (1)</span>
-      <span>iOS 17.0 及以上</span>
+<div class="app">
+  <header class="topbar">
+    <div class="segmented" id="modeSeg" role="tablist">
+      <button class="seg is-on" data-mode="stopwatch" role="tab">正计时</button>
+      <button class="seg" data-mode="countdown" role="tab">倒计时</button>
     </div>
-  </div>
+    <button class="icon-btn" id="historyBtn" aria-label="历史记录">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"></path>
+        <path d="M3.2 4.6v4.6h4.6"></path>
+        <path d="M12 7.6V12l3 1.8"></path>
+      </svg>
+    </button>
+  </header>
 
-  <div class="card">
-    <p class="title-sm">安装步骤</p>
-    <ol class="steps">
-      <li><b>用 Safari 打开本页</b>，点上面的「安装到 iPhone」，弹窗选「安装」。</li>
-      <li>回到桌面，等图标出现（图标可能是灰的，属正常）。</li>
-      <li>首次打开会提示「未受信任的开发者」。去 <b>设置 → 通用 → VPN 与设备管理</b>，点你的 Apple ID，选「信任」。</li>
-      <li>如果提示「需要开发者模式」：<b>设置 → 隐私与安全性 → 拉到最底部 → 开发者模式</b>，打开后按提示重启手机。</li>
-      <li>回桌面点开 App 即可使用。</li>
-    </ol>
-  </div>
+  <main class="content">
+    <!-- ===== 正计时 ===== -->
+    <section class="view" id="viewStopwatch">
+      <div class="limit-zone" id="limitZone"></div>
 
-  <div class="card">
-    <p class="title-sm">装不上？先做这一步</p>
-    <ol class="steps">
-      <li>把当前标签页<b>整个关掉</b>，重新用 Safari 打开本页（不要只点刷新）。</li>
-      <li>先点主按钮；若仍提示「无法安装」，<b>再点下面的「备用通道（CDN）」</b>——两条通道走的是不同的服务器和清单地址。</li>
-      <li>两条都不行的话，把手机<b>关掉 Wi-Fi 用蜂窝流量</b>再试一次。</li>
-    </ol>
-    <p class="hint">清单地址带时间戳，每次打开本页都是最新的，不会再读到旧缓存。</p>
-  </div>
+      <div class="time-zone">
+        <div class="bigtime" id="bigTime">
+          <span class="bt-main" id="btMain">00:00</span><span class="bt-frac" id="btFrac">.00</span>
+        </div>
+        <div class="subtitle" id="subtitle">点「开始」计时，随时可记段</div>
+      </div>
 
-  <div class="card warn">
-    <p class="title-sm">本次签名到期：11 月 18 日凌晨</p>
-    <p>免费 Apple ID 签名的 App 只能用 7 天，到期后图标打不开。到期时重新签名、再回到本页装一次即可，<b>计时记录不会丢</b>（存在 App 自己的沙盒里，覆盖安装会保留）。</p>
-  </div>
+      <div class="lap-zone">
+        <div class="lap-head">
+          <span class="c-idx">段次</span>
+          <span class="c-split">本段</span>
+          <span class="c-total">累计</span>
+          <span class="c-delta">对比</span>
+        </div>
+        <div class="lap-list" id="lapList"></div>
+      </div>
+    </section>
 
-  <div class="card">
-    <p class="title-sm">换台设备装</p>
-    <p class="hint" style="margin-top:0">把本页链接发到那台设备，用 Safari 打开即可。注意：签名里只登记了这一台 iPhone 的 UDID，换设备需要重新签名。</p>
-    <img class="qr" src="qr.png" alt="安装页二维码">
-  </div>
+    <!-- ===== 倒计时 ===== -->
+    <section class="view is-hidden" id="viewCountdown">
+      <div class="ring-zone">
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 268 268" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#8FF6E6"></stop>
+                <stop offset="55%" stop-color="#5EEAD4"></stop>
+                <stop offset="100%" stop-color="#F5C46B"></stop>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="134" cy="134" r="130"></circle>
+            <circle class="ring-prog" id="ringProg" cx="134" cy="134" r="130"></circle>
+          </svg>
+          <div class="ring-inner">
+            <div class="ring-status" id="ringStatus">准备就绪</div>
+            <div class="ring-time" id="ringTime">05:00</div>
+            <div class="ring-dur" id="ringDur">时长 05:00</div>
+          </div>
+        </div>
+        <div class="presets" id="presetGrid"></div>
+      </div>
+    </section>
+  </main>
 
-  <footer>LapTimer · 自制自用，未上架 App Store</footer>
+  <footer class="controls" id="controls"></footer>
 </div>
 
-<script>
-(function () {
-  var btn = document.getElementById('installBtn');
-  var btn2 = document.getElementById('installBtn2');
-  var hint = document.getElementById('hint');
+<!-- ===== 遮罩 / 面板 ===== -->
+<div class="backdrop" id="backdrop"></div>
 
-  // 时间戳：GitHub Pages / jsDelivr 都会缓存清单，带上它保证每次拿到最新版本
-  var stamp = String(Date.now());
-  var host = 'https://guo0914.github.io/laptimer/';
-  var cdn  = 'https://gcore.jsdelivr.net/gh/guo0914/laptimer@main/docs/';
-  var ipa  = host + 'LapTimer-install.ipa';
+<div class="sheet" id="limitSheet" role="dialog" aria-modal="true" aria-label="限时">
+  <div class="sheet-head">
+    <button class="head-btn" id="limitCancel">取消</button>
+    <span class="head-title">限时</span>
+    <button class="head-btn strong" id="limitDone">设置</button>
+  </div>
+  <div class="sheet-body">
+    <div class="field-label">输入时长</div>
+    <div class="input-row">
+      <input id="limitInput" class="big-input" type="text" placeholder="如 30、1:30、2:00:00"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+             enterkeyhint="done" inputmode="text">
+      <button class="clear-btn is-hidden" id="limitClear" aria-label="清空">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.5 12.1-1.4 1.4L12 13.4l-2.1 2.1-1.4-1.4L10.6 12 8.5 9.9l1.4-1.4L12 10.6l2.1-2.1 1.4 1.4L13.4 12l2.1 2.1Z"/></svg>
+      </button>
+    </div>
+    <div class="hint" id="limitHint">纯数字按分钟计算，也可写 1:30 或 90s</div>
 
-  var m1 = host + 'manifest.xml?v=' + stamp;
-  var m2 = cdn  + 'manifest-cdn2.xml?v=' + stamp;
+    <div class="field-label">常用</div>
+    <div class="preset-grid" id="limitPresets"></div>
 
-  function itms(m) {
-    return 'itms-services://?action=download-manifest&url=' + encodeURIComponent(m);
-  }
+    <div class="note">
+      <p>到达时限时只提醒、不打断计时，你可以继续分段或手动结束。</p>
+      <p class="dim">支持写法：30 ＝ 30 分钟 · 1:30 ＝ 1 分 30 秒 · 1:30:00 ＝ 1 小时 30 分 · 90s ＝ 90 秒 · 2h ＝ 2 小时</p>
+    </div>
 
-  var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(navigator.userAgent);
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    <button class="danger-ghost is-hidden" id="limitRemove">清除限时</button>
+  </div>
+</div>
 
-  if (!isIOS || !isSafari) {
-    btn.className = 'btn disabled';
-    btn.textContent = '请在 iPhone Safari 中打开';
-    btn2.style.display = 'none';
-    hint.textContent = '微信、QQ、Chrome 等内置浏览器无法触发安装，请点右上角「…」选择「在 Safari 中打开」。';
-    return;
-  }
+<div class="sheet" id="durationSheet" role="dialog" aria-modal="true" aria-label="自定义时长">
+  <div class="sheet-head">
+    <button class="head-btn" id="durCancel">取消</button>
+    <span class="head-title">自定义时长</span>
+    <button class="head-btn strong" id="durDone">确定</button>
+  </div>
+  <div class="sheet-body dur-body">
+    <div class="dur-edit">
+      <button class="step-btn" id="durMinus" aria-label="减少">−</button>
+      <input class="dur-input" id="durInput" type="number" inputmode="numeric" min="1" max="600" value="5">
+      <button class="step-btn" id="durPlus" aria-label="增加">＋</button>
+    </div>
+    <div class="dur-unit">分钟</div>
+  </div>
+</div>
 
-  function ready() {
-    btn.className = 'btn';
-    btn.textContent = '安装到 iPhone';
-    btn.href = itms(m1);
-    btn2.className = 'btn secondary';
-    btn2.textContent = '备用通道（CDN）';
-    btn2.href = itms(m2);
-  }
-  function missing() {
-    btn.className = 'btn disabled';
-    btn.textContent = '安装包未就绪';
-    hint.textContent = '签名后的安装包还没上传。请先在电脑上完成签名，再刷新本页。';
-  }
+<div class="sheet tall" id="historySheet" role="dialog" aria-modal="true" aria-label="记录">
+  <div class="sheet-head">
+    <span class="head-title">记录</span>
+    <button class="head-btn strong" id="historyDone">完成</button>
+  </div>
+  <div class="sheet-body nopad" id="historyBody"></div>
+</div>
 
-  fetch(ipa, { method: 'HEAD', cache: 'no-store' })
-    .then(function (r) { r.ok ? ready() : missing(); })
-    .catch(missing);
-})();
-</script>
+<div class="dialog" id="confirmDialog" role="dialog" aria-modal="true">
+  <div class="dialog-card">
+    <div class="dialog-title">结束这次计时？</div>
+    <div class="dialog-msg">结束后会把这次的分段保存到「记录」里。</div>
+    <button class="dlg-btn" id="confirmSave">结束并保存记录</button>
+    <button class="dlg-btn destructive" id="confirmDiscard">直接丢弃</button>
+    <button class="dlg-btn cancel" id="confirmCancel">继续计时</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="install-tip is-hidden" id="installTip">
+  <div class="tip-text">点底部分享按钮 → 「添加到主屏幕」，以后像 App 一样打开，离线也能用。</div>
+  <button class="tip-close" id="installTipClose" aria-label="关闭">✕</button>
+</div>
+
+<script src="time.js"></script>
+<script src="core.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
