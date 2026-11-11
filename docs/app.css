@@ -444,6 +444,28 @@ body {
   background: linear-gradient(180deg, rgba(7, 9, 15, 0), rgba(7, 9, 15, 0.92));
 }
 
+/* 常亮状态提示：只在异常时露脸，正常时是一颗安静的小圆点 */
+.keep-badge {
+  flex: none;
+  align-self: center;
+  margin-bottom: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: var(--accent);
+  background: rgba(94, 234, 212, 0.10);
+  border: 1px solid rgba(94, 234, 212, 0.22);
+  max-width: 86vw;
+  text-align: center;
+}
+.keep-badge.is-hidden { display: none; }
+.keep-badge.bad {
+  color: var(--warn);
+  background: rgba(245, 196, 107, 0.10);
+  border-color: rgba(245, 196, 107, 0.26);
+}
+
 .circle {
   border: 0;
   border-radius: 50%;
@@ -503,7 +525,15 @@ body {
   width: 268px;
   height: 268px;
   flex: none;
+  transition: width 0.32s cubic-bezier(0.32, 0.72, 0, 1), height 0.32s cubic-bezier(0.32, 0.72, 0, 1);
 }
+/* 计时进行中把环撑到接近满屏，隔着桌子也能看清 */
+.view.is-live .ring-wrap {
+  width: min(86vw, 46vh);
+  height: min(86vw, 46vh);
+}
+.view.is-live .ring-time { font-size: clamp(54px, 19vw, 86px); }
+.view.is-live .ring-status { font-size: 12px; }
 .ring { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring-track {
   fill: none;

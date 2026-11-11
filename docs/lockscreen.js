@@ -19,9 +19,74 @@
   var on = false;
   var handlers = {};
   var lastMeta = null;
+  var lastArt = null;
+  var artUrl = null;
 
   function supported() {
     return !!(root.MediaMetadata && root.navigator && root.navigator.mediaSession);
+  }
+
+  /* 把倒计时数字画成一张图，塞进锁屏卡片的封面位。
+   * 锁屏卡片上标题字小、封面位最大，所以「满屏」只能靠封面图。
+   * progress 传 null 时不画环（正计时没有总时长，画满环会误导）。 */
+  function renderArtwork(text, sub, warm, progress) {
+    var hasRing = typeof progress === 'number';
+    var key = text + '|' + (sub || '') + '|' + (warm ? 'w' : 'c') + '|' + (hasRing ? progress.toFixed(3) : '-');
+    if (key === lastArt && artUrl) return artUrl;
+
+    var S = 512;
+    var cv = document.createElement('canvas');
+    cv.width = S;
+    cv.height = S;
+    var g = cv.getContext('2d');
+
+    g.fillStyle = '#07090F';
+    g.fillRect(0, 0, S, S);
+
+    var grd = g.createRadialGradient(S / 2, S * 0.42, 0, S / 2, S * 0.42, S * 0.72);
+    grd.addColorStop(0, warm ? 'rgba(245,196,107,0.18)' : 'rgba(94,234,212,0.18)');
+    grd.addColorStop(1, 'rgba(7,9,15,0)');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, S, S);
+
+    var cx = S / 2;
+    var cy = S * 0.44;
+    var r = S * 0.36;
+
+    /* 进度环：跟主界面一样，剩下的时间越少环越短 */
+    if (hasRing) {
+      g.lineWidth = S * 0.026;
+      g.strokeStyle = 'rgba(255,255,255,0.10)';
+      g.beginPath();
+      g.arc(cx, cy, r, 0, Math.PI * 2);
+      g.stroke();
+
+      if (progress > 0.001) {
+        g.strokeStyle = warm ? '#F5C46B' : '#5EEAD4';
+        g.lineCap = 'round';
+        g.beginPath();
+        g.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress);
+        g.stroke();
+      }
+    }
+
+    /* 数字太长就自动缩字号，保证不溢出环 */
+    var size = text.length <= 4 ? S * 0.30 : (text.length <= 5 ? S * 0.25 : S * 0.20);
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillStyle = '#EEF2FA';
+    g.font = '200 ' + size + 'px -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif';
+    g.fillText(text, cx, cy);
+
+    if (sub) {
+      g.fillStyle = warm ? '#F5C46B' : '#5EEAD4';
+      g.font = '500 ' + Math.round(S * 0.062) + 'px -apple-system, "SF Pro Text", "PingFang SC", Arial, sans-serif';
+      g.fillText(sub, cx, S * 0.90);
+    }
+
+    lastArt = key;
+    artUrl = cv.toDataURL('image/png');
+    return artUrl;
   }
 
   /* 生成 10 秒极低幅度 WAV：人耳听不见，但音频会话是真实活跃的 */
@@ -113,25 +178,38 @@
     if (on) bindActions();
   }
 
-  /* info: { title, subtitle, elapsed, duration, paused } */
+  /* info: { title, subtitle, elapsed, duration, paused, big, warm } */
   function update(info) {
     if (!on || !supported() || !info) return;
 
     var ms = root.navigator.mediaSession;
 
-    if (!lastMeta || lastMeta.title !== info.title || lastMeta.subtitle !== info.subtitle) {
+    var art = null;
+    if (info.big) {
       try {
-        ms.metadata = new root.MediaMetadata({
+        /* artProgress 为数字才画环；传 null / undefined 表示没有总时长 */
+        var frac = typeof info.artProgress === 'number' ? info.artProgress : null;
+        art = renderArtwork(info.big, info.artSub || '', !!info.warm,
+          frac == null ? null : Math.max(0, Math.min(1, frac)));
+      } catch (e) { art = null; }
+    }
+
+    if (!lastMeta || lastMeta.title !== info.title || lastMeta.subtitle !== info.subtitle || lastMeta.art !== art) {
+      try {
+        var meta = {
           title: info.title,
           artist: info.subtitle || '分段计时',
-          album: '分段计时',
-          artwork: [
+          album: '分段计时'
+        };
+        meta.artwork = art
+          ? [{ src: art, sizes: '512x512', type: 'image/png' }]
+          : [
             { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
             { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
-          ]
-        });
+          ];
+        ms.metadata = new root.MediaMetadata(meta);
       } catch (e) { /* ignore */ }
-      lastMeta = { title: info.title, subtitle: info.subtitle };
+      lastMeta = { title: info.title, subtitle: info.subtitle, art: art };
     }
 
     try {

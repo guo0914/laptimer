@@ -92,18 +92,82 @@
   /* ================= 屏幕常亮 ================= */
 
   var wakeLock = null;
+  var wakeWanted = false;
+  var wakeRetry = 0;
+  var wakeWatchdog = null;
+  var wakeState = 'off';        /* off | on | failed | unsupported */
+
+  function setWakeState(next) {
+    if (wakeState === next) return;
+    wakeState = next;
+    if (el.keepBadge) {
+      el.keepBadge.classList.toggle('is-hidden', next === 'off');
+      el.keepBadge.classList.toggle('bad', next === 'failed' || next === 'unsupported');
+      el.keepBadge.textContent =
+        next === 'on' ? '屏幕常亮中' :
+        next === 'failed' ? '常亮被系统拒绝了 · 关掉「低电量模式」再试' :
+        next === 'unsupported' ? '这个浏览器不支持常亮，请用 Safari 打开' : '';
+    }
+  }
+
+  function requestWake() {
+    if (!('wakeLock' in navigator)) { setWakeState('unsupported'); return; }
+    if (!wakeWanted) { setWakeState('off'); return; }
+    /* 后台/锁屏时申请必失败，等回到前台再说 */
+    if (document.visibilityState !== 'visible') return;
+    if (wakeLock) { setWakeState('on'); return; }
+
+    navigator.wakeLock.request('screen').then(function (lock) {
+      wakeLock = lock;
+      wakeRetry = 0;
+      setWakeState('on');
+      lock.addEventListener('release', function () {
+        wakeLock = null;
+        setWakeState(wakeWanted ? 'failed' : 'off');
+        /* iOS 切后台、锁屏、来电、低电量模式都会把锁放掉，回到前台必须自己重新申请，
+         * 不重新申请就会一直黑屏 —— 这是之前「不能常亮」的真因 */
+        if (wakeWanted && document.visibilityState === 'visible') {
+          wakeRetry = Math.min(wakeRetry + 1, 5);
+          setTimeout(requestWake, 200 * wakeRetry);
+        }
+      });
+    }).catch(function () {
+      wakeLock = null;
+      setWakeState('failed');
+      if (wakeWanted && document.visibilityState === 'visible' && wakeRetry < 6) {
+        wakeRetry += 1;
+        setTimeout(requestWake, 400 * wakeRetry);
+      }
+    });
+  }
+
+  /* 看门狗：每 5 秒确认一次。iOS 经常静悄悄地把锁收走而不触发 release */
+  function startWakeWatchdog() {
+    if (wakeWatchdog) return;
+    wakeWatchdog = setInterval(function () {
+      if (!wakeWanted) { stopWakeWatchdog(); return; }
+      if (document.visibilityState !== 'visible') return;
+      if (!wakeLock) { wakeRetry = 0; requestWake(); }
+    }, 5000);
+  }
+
+  function stopWakeWatchdog() {
+    if (wakeWatchdog) { clearInterval(wakeWatchdog); wakeWatchdog = null; }
+  }
 
   function keepAwake(on) {
-    if (!('wakeLock' in navigator)) return;
+    wakeWanted = !!on;
     if (on) {
-      if (wakeLock) return;
-      navigator.wakeLock.request('screen').then(function (lock) {
-        wakeLock = lock;
-        lock.addEventListener('release', function () { wakeLock = null; });
-      }).catch(function () { /* ignore */ });
-    } else if (wakeLock) {
-      try { wakeLock.release(); } catch (e) { /* ignore */ }
-      wakeLock = null;
+      wakeRetry = 0;
+      requestWake();
+      startWakeWatchdog();
+    } else {
+      stopWakeWatchdog();
+      if (wakeLock) {
+        try { wakeLock.release(); } catch (e) { /* ignore */ }
+        wakeLock = null;
+      }
+      setWakeState('off');
     }
   }
 
@@ -157,6 +221,7 @@
     ringTime: $('ringTime'),
     ringDur: $('ringDur'),
     presetGrid: $('presetGrid'),
+    keepBadge: $('keepBadge'),
     controls: $('controls'),
     backdrop: $('backdrop'),
     limitSheet: $('limitSheet'),
@@ -354,6 +419,8 @@
     else if (countdown.hasStarted()) el.ringStatus.textContent = '已暂停';
     else el.ringStatus.textContent = '准备就绪';
     el.ringDur.textContent = '时长 ' + TimeText.clock(cd.duration);
+    /* 开跑后把环放大到接近满屏 */
+    el.viewCountdown.classList.toggle('is-live', countdown.hasStarted());
   }
 
   /* ================= 渲染：底部按钮 ================= */
@@ -611,16 +678,30 @@
         subtitle: sub,
         elapsed: elapsed,
         duration: sw.limit || 0,
-        paused: !sw.isRunning
+        paused: !sw.isRunning,
+        /* 正计时也画封面图，锁屏上数字更大更好认；没有总时长就不画环 */
+        big: TimeText.stopwatchParts(elapsed).main,
+        artSub: !stopwatch.hasSession() ? '未开始' : (sw.isRunning ? '第 ' + n + ' 段' : '已暂停'),
+        artProgress: sw.limit ? Math.min(1, elapsed / sw.limit) : null,
+        warm: false
       };
     }
     var remaining = countdown.remaining();
+    var cdStatus = countdown.isFinished() ? '已结束'
+      : (cd.isRunning ? '倒计时中' : (countdown.hasStarted() ? '已暂停' : '准备就绪'));
+    var cdText = TimeText.countdown(remaining);
     return {
-      title: TimeText.countdown(remaining),
-      subtitle: countdown.isFinished() ? '已结束' : (cd.isRunning ? '倒计时中' : (countdown.hasStarted() ? '已暂停' : '准备就绪')),
+      /* 标题直接放数字：锁屏卡片的标题字最大，比写「分段计时」直观得多 */
+      title: cdText,
+      subtitle: cdStatus + ' · 时长 ' + TimeText.clock(cd.duration),
       elapsed: cd.duration - remaining,
       duration: cd.duration,
-      paused: !cd.isRunning
+      paused: !cd.isRunning,
+      /* 封面位是卡片上最大的区域，把同一个数字画进去 = 变相满屏 */
+      big: cdText,
+      artSub: cdStatus,
+      artProgress: cd.duration > 0 ? remaining / cd.duration : 0,
+      warm: true
     };
   }
 

@@ -1,6 +1,6 @@
 /* 离线缓存：安装后断网也能打开。
  * 版本号变了才会重新拉取，改样式/脚本时记得改这里。 */
-var CACHE = 'laptimer-v3';
+var CACHE = 'laptimer-v4';
 var ASSETS = [
   './',
   './index.html',
