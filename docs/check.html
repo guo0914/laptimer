@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>安装自检 · 分段计时</title>
+<style>
+  :root {
+    --bg: #07090F;
+    --bg-top: #0B1218;
+    --card: rgba(255,255,255,0.06);
+    --stroke: rgba(255,255,255,0.09);
+    --text: #EEF2FA;
+    --text2: #78859A;
+    --text3: #646F87;
+    --accent: #5EEAD4;
+    --warn: #F5C46B;
+    --danger: #F06F6F;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif; }
+  body { background: radial-gradient(120% 60% at 50% 0%, var(--bg-top) 0%, var(--bg) 60%) no-repeat; min-height: 100vh;
+    padding: calc(env(safe-area-inset-top) + 24px) 20px calc(env(safe-area-inset-bottom) + 32px); }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 6px; letter-spacing: 0.2px; }
+  .sub { color: var(--text2); font-size: 13px; margin: 0 0 20px; line-height: 1.5; }
+  .card { background: var(--card); border: 1px solid var(--stroke); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  .row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .row:last-child { border-bottom: none; padding-bottom: 0; }
+  .row:first-child { padding-top: 0; }
+  .badge { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; line-height: 20px;
+    text-align: center; font-weight: 700; margin-top: 1px; }
+  .badge.ok { background: rgba(94,234,212,0.18); color: var(--accent); }
+  .badge.bad { background: rgba(240,111,111,0.18); color: var(--danger); }
+  .badge.wait { background: rgba(245,196,107,0.18); color: var(--warn); }
+  .label { font-size: 14px; font-weight: 500; }
+  .detail { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.5; word-break: break-all; font-variant-numeric: tabular-nums; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 13px; }
+  .kv span:first-child { color: var(--text2); flex: 0 0 auto; }
+  .kv span:last-child { text-align: right; word-break: break-all; font-variant-numeric: tabular-nums; }
+  button { width: 100%; border: none; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 600;
+    background: linear-gradient(180deg, #7FF3E0 0%, #5EEAD4 100%); color: #04211C; margin-top: 4px;
+    font-family: inherit; }
+  button.ghost { background: rgba(255,255,255,0.07); color: var(--text); border: 1px solid var(--stroke); }
+  button:active { opacity: 0.75; }
+  .verdict { border-radius: 16px; padding: 16px; margin-bottom: 14px; font-size: 14px; line-height: 1.6; }
+  .verdict.good { background: rgba(94,234,212,0.10); border: 1px solid rgba(94,234,212,0.28); }
+  .verdict.bad { background: rgba(240,111,111,0.10); border: 1px solid rgba(240,111,111,0.28); }
+  .verdict b { font-weight: 600; }
+  .foot { color: var(--text3); font-size: 11px; text-align: center; margin-top: 22px; line-height: 1.6; }
+  textarea { width: 100%; height: 150px; background: rgba(0,0,0,0.35); color: var(--text2); border: 1px solid var(--stroke);
+    border-radius: 12px; padding: 12px; font-size: 12px; font-family: ui-monospace, Menlo, monospace; margin-top: 10px;
+    resize: vertical; }
+</style>
+</head>
+<body>
+
+<h1>安装自检</h1>
+<p class="sub">在 iPhone 的 Safari 里打开本页。它会用<b>手机自己</b>去取清单和安装包，测出到底是哪一步断了。全程只发 HEAD 请求，不下载整包。</p>
+
+<div class="verdict" id="verdict" style="display:none"></div>
+
+<div class="card">
+  <div class="row"><div class="badge wait" id="b-ua">·</div><div><div class="label">浏览器环境</div><div class="detail" id="d-ua">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-mani">·</div><div><div class="label">主通道清单 manifest.xml</div><div class="detail" id="d-mani">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-ipa">·</div><div><div class="label">主通道安装包 .ipa</div><div class="detail" id="d-ipa">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-mani2">·</div><div><div class="label">备用通道清单（CDN）</div><div class="detail" id="d-mani2">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-ipa2">·</div><div><div class="label">备用通道安装包（CDN）</div><div class="detail" id="d-ipa2">检测中…</div></div></div>
+</div>
+
+<div class="card">
+  <div class="kv"><span>签名</span><span id="k-sign">—</span></div>
+  <div class="kv"><span>清单包名</span><span id="k-bid">—</span></div>
+  <div class="kv"><span>清单版本</span><span id="k-bver">—</span></div>
+  <div class="kv"><span>系统版本</span><span id="k-os">—</span></div>
+  <div class="kv"><span>当前网络</span><span id="k-net">—</span></div>
+</div>
+
+<button id="copy" class="ghost">复制自检结果</button>
+<textarea id="out" readonly style="display:none"></textarea>
+
+<p class="foot">分段计时 · 安装自检页<br>把上面的结果发给我，就能定位是哪一步的问题。</p>
+
+<script>
+(function () {
+  var PAGES = 'https://guo0914.github.io/laptimer/';
+  var CDN = 'https://gcore.jsdelivr.net/gh/guo0914/laptimer@main/docs/';
+  var results = {};
+
+  function $(id) { return document.getElementById(id); }
+
+  function mark(key, ok, text) {
+    var b = $('b-' + key), d = $('d-' + key);
+    if (!b) return;
+    b.className = 'badge ' + (ok === null ? 'wait' : (ok ? 'ok' : 'bad'));
+    b.textContent = ok === null ? '·' : (ok ? '✓' : '✕');
+    if (d && text) d.textContent = text;
+    results[key] = (ok === null ? 'PENDING' : (ok ? 'PASS' : 'FAIL')) + ' :: ' + (text || '');
+  }
+
+  var ua = navigator.userAgent;
+  var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua);
+  var osMatch = ua.match(/OS (\d+)[._](\d+)[._]?(\d+)?/);
+
+  $('k-os').textContent = osMatch ? ('iOS ' + osMatch[1] + '.' + osMatch[2] + (osMatch[3] ? '.' + osMatch[3] : '')) : (isIOS ? 'iOS（版本未知）' : '非 iOS');
+  $('k-net').textContent = navigator.onLine ? '在线' : '离线';
+  $('k-sign').textContent = '开发签名（免费 Apple ID）';
+
+  if (!isIOS) {
+    mark('ua', false, '不是 iPhone：请在 iPhone 的 Safari 里打开本页。');
+  } else if (!isSafari) {
+    mark('ua', false, '不是 Safari：当前在 App 内置浏览器里（微信/QQ/Chrome 等）。请点右上角「…」→「在 Safari 中打开」。');
+  } else {
+    mark('ua', true, 'iPhone + Safari，可以正常发起安装。');
+  }
+
+  function head(url) {
+    return fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + 'z=' + Date.now(), {
+      method: 'HEAD', cache: 'no-store', mode: 'cors'
+    }).then(function (r) {
+      return {
+        status: r.status,
+        type: r.headers.get('content-type') || '(无)',
+        len: r.headers.get('content-length') || '(无)',
+        ok: r.ok
+      };
+    });
+  }
+
+  function checkManifest(key, url) {
+    return fetch(url + '?z=' + Date.now(), { cache: 'no-store', mode: 'cors' })
+      .then(function (r) { return r.text().then(function (t) { return { status: r.status, type: r.headers.get('content-type') || '(无)', body: t }; }); })
+      .then(function (res) {
+        if (!res.ok && res.status !== 0) { mark(key, false, 'HTTP ' + res.status + ' · ' + res.type); return null; }
+        var bid = (res.body.match(/<key>bundle-identifier<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
+        var bver = (res.body.match(/<key>bundle-version<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
+        var pkg = (res.body.match(/<key>kind<\/key>\s*<string>software-package<\/string>\s*<key>url<\/key>\s*<string>([^<]+)<\/string>/) || [])[1];
+        if (!bid) { mark(key, false, '能下载，但内容不是合法清单（' + res.type + '）'); return null; }
+        mark(key, true, 'HTTP 200 · ' + res.type + ' · 包名 ' + bid + ' · 版本 ' + bver);
+        $('k-bid').textContent = bid;
+        $('k-bver').textContent = bver;
+        return pkg;
+      })
+      .catch(function (e) { mark(key, false, '取不到：' + (e && e.message ? e.message : e)); return null; });
+  }
+
+  function checkIpa(key, url) {
+    return head(url).then(function (r) {
+      if (!r.ok) { mark(key, false, 'HTTP ' + r.status + ' · ' + r.type); return; }
+      var size = parseInt(r.len, 10);
+      var sizeText = isNaN(size) ? r.len : (Math.round(size / 1024) + ' KB');
+      var good = /octet-stream|zip/.test(r.type);
+      mark(key, good, 'HTTP 200 · ' + sizeText + ' · ' + r.type + (good ? '' : '（类型不对，iOS 可能拒绝）'));
+    }).catch(function (e) { mark(key, false, '取不到：' + (e && e.message ? e.message : e)); });
+  }
+
+  Promise.all([
+    checkManifest('mani', PAGES + 'manifest.xml'),
+    checkManifest('mani2', CDN + 'manifest-cdn.xml')
+  ]).then(function () {
+    return Promise.all([
+      checkIpa('ipa', PAGES + 'LapTimer-signed.ipa'),
+      checkIpa('ipa2', CDN + 'LapTimer-signed.ipa')
+    ]);
+  }).then(function () {
+    var keys = ['ua', 'mani', 'ipa', 'mani2', 'ipa2'];
+    var fails = keys.filter(function (k) { return (results[k] || '').indexOf('FAIL') === 0; });
+    var v = $('verdict');
+    v.style.display = 'block';
+    if (fails.length === 0) {
+      v.className = 'verdict good';
+      v.innerHTML = '<b>网络这一关是通的。</b><br>手机能拿到清单也能拿到安装包，说明问题不在网络，而在安装包本身（签名 / 描述文件）。<br>把下面的结果发给我。';
+    } else {
+      v.className = 'verdict bad';
+      v.innerHTML = '<b>有 ' + fails.length + ' 项没通过。</b><br>请把下面的结果发给我，我会按失败项定位。';
+    }
+    var lines = ['【分段计时 安装自检】', '时间: ' + new Date().toISOString(), 'UA: ' + ua, ''];
+    keys.forEach(function (k) { lines.push(k + ': ' + (results[k] || 'N/A')); });
+    $('out').value = lines.join('\n');
+  });
+
+  $('copy').addEventListener('click', function () {
+    var ta = $('out');
+    ta.style.display = 'block';
+    ta.select();
+    var text = ta.value;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        $('copy').textContent = '已复制 ✓';
+      }, function () {
+        $('copy').textContent = '请长按上面的框手动复制';
+      });
+    } else {
+      try { document.execCommand('copy'); $('copy').textContent = '已复制 ✓'; }
+      catch (e) { $('copy').textContent = '请长按上面的框手动复制'; }
+    }
+  });
+})();
+</script>
+</body>
+</html>
