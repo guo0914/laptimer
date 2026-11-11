@@ -68,6 +68,7 @@
   <div class="row"><div class="badge wait" id="b-ipa2">·</div><div><div class="label">备用通道安装包（CDN）</div><div class="detail" id="d-ipa2">检测中…</div></div></div>
   <div class="row"><div class="badge wait" id="b-ppq">·</div><div><div class="label">Apple 证书核验 ppq.apple.com</div><div class="detail" id="d-ppq">检测中…</div></div></div>
   <div class="row"><div class="badge wait" id="b-ocsp">·</div><div><div class="label">Apple 吊销查询 ocsp.apple.com</div><div class="detail" id="d-ocsp">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-dev">·</div><div><div class="label">当前设备信息</div><div class="detail" id="d-dev">检测中…</div></div></div>
 </div>
 
 <div class="card">
@@ -179,6 +180,21 @@
     });
   }
 
+  function checkDev(key) {
+    return fetch(PAGES + 'manifest.xml?z=' + Date.now(), { method: 'HEAD', cache: 'no-store', mode: 'cors' })
+      .then(function (r) {
+        var d = r.headers.get('date');
+        var tz = 'UTC' + (new Date().getTimezoneOffset() <= 0 ? '+' : '-') + Math.abs(new Date().getTimezoneOffset() / 60);
+        if (!d) { mark(key, null, '设备时间 ' + new Date().toLocaleString() + '（' + tz + '）· 服务器没给时间，无法比对'); return; }
+        var skew = Math.round((Date.now() - new Date(d).getTime()) / 1000);
+        var abs = Math.abs(skew);
+        var text = '设备时间 ' + new Date().toLocaleString() + '（' + tz + '）· 与服务器差 ' + skew + ' 秒';
+        if (abs <= 120) { mark(key, true, text + '，正常'); }
+        else { mark(key, false, text + ' —— 差得太多，iOS 校验证书会失败，请把「设置 → 通用 → 日期与时间 → 自动设置」打开'); }
+      })
+      .catch(function (e) { mark(key, null, '设备时间 ' + new Date().toLocaleString() + '（比对失败：' + (e && e.message ? e.message : e) + '）'); });
+  }
+
   Promise.all([
     checkManifest('mani', PAGES + 'manifest.xml'),
     checkManifest('mani2', CDN + 'manifest-cdn2.xml')
@@ -187,10 +203,11 @@
       checkIpa('ipa', PAGES + 'LapTimer-install.ipa'),
       checkIpa('ipa2', CDN + 'LapTimer-install.ipa'),
       checkApple('ppq', 'https://ppq.apple.com/', '开发者证书核验'),
-      checkApple('ocsp', 'https://ocsp.apple.com/', '证书吊销查询')
+      checkApple('ocsp', 'http://ocsp.apple.com/ocsp03-wwdrg303', '证书吊销查询（证书里写的真实地址）'),
+      checkDev('dev')
     ]);
   }).then(function () {
-    var keys = ['ua', 'mani', 'ipa', 'mani2', 'ipa2', 'ppq', 'ocsp'];
+    var keys = ['ua', 'mani', 'ipa', 'mani2', 'ipa2', 'ppq', 'ocsp', 'dev'];
     var fails = keys.filter(function (k) { return (results[k] || '').indexOf('FAIL') === 0; });
     var v = $('verdict');
     v.style.display = 'block';
@@ -200,10 +217,14 @@
     } else {
       var netFails = fails.filter(function (k) { return k === 'mani' || k === 'ipa' || k === 'mani2' || k === 'ipa2'; });
       var appleFails = fails.filter(function (k) { return k === 'ppq' || k === 'ocsp'; });
+      var devFails = fails.filter(function (k) { return k === 'dev'; });
       v.className = 'verdict bad';
       var msg = '<b>有 ' + fails.length + ' 项没通过。</b><br>';
+      if (devFails.length) {
+        msg += '手机时间跟真实时间差得太多 —— iOS 会用时间去校验证书有效期，时间不对一定装不上。先去「设置 → 通用 → 日期与时间」打开「自动设置」。<br>';
+      }
       if (appleFails.length) {
-        msg += 'Apple 的证书核验连不上 —— iOS 装开发签名 App 必须过这一关，这很可能就是装不上的直接原因。<br>';
+        msg += '有一项 Apple 的连接没通。注意：这一项只是「顺带测一下」，装不上时它经常是通的，通了也不代表能装上，所以它不是结论，只作参考。<br>';
       }
       if (netFails.length) {
         msg += '取清单/安装包这一步就没通，先解决网络。<br>';
