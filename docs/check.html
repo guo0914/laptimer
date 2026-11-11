@@ -66,6 +66,8 @@
   <div class="row"><div class="badge wait" id="b-ipa">·</div><div><div class="label">主通道安装包 .ipa</div><div class="detail" id="d-ipa">检测中…</div></div></div>
   <div class="row"><div class="badge wait" id="b-mani2">·</div><div><div class="label">备用通道清单（CDN）</div><div class="detail" id="d-mani2">检测中…</div></div></div>
   <div class="row"><div class="badge wait" id="b-ipa2">·</div><div><div class="label">备用通道安装包（CDN）</div><div class="detail" id="d-ipa2">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-ppq">·</div><div><div class="label">Apple 证书核验 ppq.apple.com</div><div class="detail" id="d-ppq">检测中…</div></div></div>
+  <div class="row"><div class="badge wait" id="b-ocsp">·</div><div><div class="label">Apple 吊销查询 ocsp.apple.com</div><div class="detail" id="d-ocsp">检测中…</div></div></div>
 </div>
 
 <div class="card">
@@ -155,25 +157,59 @@
     }).catch(function (e) { mark(key, false, '取不到：' + (e && e.message ? e.message : e)); });
   }
 
+  function checkApple(key, url, label) {
+    var ctl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+    var t0 = Date.now();
+    return fetch(url + '?z=' + Date.now(), {
+      method: 'GET', cache: 'no-store', mode: 'no-cors',
+      signal: ctl ? ctl.signal : undefined
+    }).then(function () {
+      clearTimeout(timer);
+      var ms = Date.now() - t0;
+      mark(key, true, '能连上（' + ms + 'ms，' + label + '）');
+    }).catch(function (e) {
+      clearTimeout(timer);
+      var ms = Date.now() - t0;
+      if (e && e.name === 'AbortError') {
+        mark(key, false, '超时未响应（>8s）——iOS 会卡在这一步，装不上');
+      } else {
+        mark(key, false, '连不上：' + (e && e.message ? e.message : e));
+      }
+    });
+  }
+
   Promise.all([
     checkManifest('mani', PAGES + 'manifest.xml'),
     checkManifest('mani2', CDN + 'manifest-cdn.xml')
   ]).then(function () {
     return Promise.all([
       checkIpa('ipa', PAGES + 'LapTimer-signed.ipa'),
-      checkIpa('ipa2', CDN + 'LapTimer-signed.ipa')
+      checkIpa('ipa2', CDN + 'LapTimer-signed.ipa'),
+      checkApple('ppq', 'https://ppq.apple.com/', '开发者证书核验'),
+      checkApple('ocsp', 'https://ocsp.apple.com/', '证书吊销查询')
     ]);
   }).then(function () {
-    var keys = ['ua', 'mani', 'ipa', 'mani2', 'ipa2'];
+    var keys = ['ua', 'mani', 'ipa', 'mani2', 'ipa2', 'ppq', 'ocsp'];
     var fails = keys.filter(function (k) { return (results[k] || '').indexOf('FAIL') === 0; });
     var v = $('verdict');
     v.style.display = 'block';
     if (fails.length === 0) {
       v.className = 'verdict good';
-      v.innerHTML = '<b>网络这一关是通的。</b><br>手机能拿到清单也能拿到安装包，说明问题不在网络，而在安装包本身（签名 / 描述文件）。<br>把下面的结果发给我。';
+      v.innerHTML = '<b>网络这一关是通的。</b><br>手机能拿到清单、安装包，也能连上 Apple 的核验服务。说明问题出在安装包本身（签名 / 描述文件），不是网络。<br>把下面的结果发给我。';
     } else {
+      var netFails = fails.filter(function (k) { return k === 'mani' || k === 'ipa' || k === 'mani2' || k === 'ipa2'; });
+      var appleFails = fails.filter(function (k) { return k === 'ppq' || k === 'ocsp'; });
       v.className = 'verdict bad';
-      v.innerHTML = '<b>有 ' + fails.length + ' 项没通过。</b><br>请把下面的结果发给我，我会按失败项定位。';
+      var msg = '<b>有 ' + fails.length + ' 项没通过。</b><br>';
+      if (appleFails.length) {
+        msg += 'Apple 的证书核验连不上 —— iOS 装开发签名 App 必须过这一关，这很可能就是装不上的直接原因。<br>';
+      }
+      if (netFails.length) {
+        msg += '取清单/安装包这一步就没通，先解决网络。<br>';
+      }
+      msg += '把下面的结果发给我。';
+      v.innerHTML = msg;
     }
     var lines = ['【分段计时 安装自检】', '时间: ' + new Date().toISOString(), 'UA: ' + ua, ''];
     keys.forEach(function (k) { lines.push(k + ': ' + (results[k] || 'N/A')); });
